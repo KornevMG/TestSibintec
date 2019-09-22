@@ -166,7 +166,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\DB.cs" />
-    <Compile Include="Models\HolidayViewModel.cs" />
     <Compile Include="Models\TaskList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
