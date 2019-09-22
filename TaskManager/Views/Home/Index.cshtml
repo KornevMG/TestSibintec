@@ -1,0 +1,13 @@
+﻿@model IEnumerable<TaskManager.Models.TaskList>
+
+@{
+    ViewBag.Title = "Index";
+}
+<div id="results">
+    @Html.Partial("TaskSearch")
+</div>
+
+
+
+<h3 style="margin-top:100px"> Обновляется только PartialView, страница загрузилась в момент @DateTime.Now</h3>
+

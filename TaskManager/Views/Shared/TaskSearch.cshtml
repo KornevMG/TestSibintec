@@ -1,0 +1,112 @@
+﻿@model IEnumerable<TaskManager.Models.TaskList>
+
+
+<div id="searchresults">
+    <div id="res" class="center-div">
+        <table class="TaskTable">
+            <tr>
+                <th class="thB"></th>
+                <th class="thBorder">
+                    I want to ..
+                </th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.CheckBoxFor(modelItem => item.Mark, new { id = item.Id })
+                    </td>
+                    <td class="tdBorder">
+                        @{string style = (item.Mark) ? "text-decoration: line-through;" : null; }
+                        <div style="@style">@Html.DisplayFor(modelItem => item.Name, new { id = item.Id })</div>
+                    </td>
+
+                </tr>
+            }
+
+            <tr>
+                <td></td>
+                <td class="tdBorder">
+                    <input type="text" id="NewTask" placeholder="NewTask" name="NewTask" style="border:none">
+                </td>
+            </tr>
+
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td class="tdBorder">
+                        @Model.Count().ToString() @((@Model.Count() > 1) ? (" tasks") : (" task"))
+                    </td>
+
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<script>
+        $('input:checkbox').click(function () {
+        var $this = $(this);
+        if ($this.is(":checked")) {
+                $.ajax({
+                url: '/Home/CheckTask',
+                type: 'POST',
+                async: false,
+                data: "Id=" + $this.attr("id") + "&Mark=" + 1,  
+                cache: false,
+                timeout: 30000,
+                error: function () {
+                    //alert('error');
+                    return true;
+                },
+                success: function (partialViewResult) {
+                    $("#results").html(partialViewResult);
+                }
+            });
+        } else {
+
+                $.ajax({
+                url: '/Home/CheckTask',
+                type: 'POST',
+                async: false,
+                data: "Id=" + $this.attr("id") + "&Mark=" + 0,  
+                cache: false,
+                timeout: 30000,
+                error: function () {
+                    //alert('error');
+                    return true;
+                },
+                success: function (partialViewResult) {
+                    $("#results").html(partialViewResult);
+                }
+            });
+        }
+    });
+
+ 
+        $('#NewTask').focusout(function () {
+            var NewTask = $(this).val();
+            $.ajax({
+                url: '/Home/SaveNewTask',
+                type: 'POST',
+                async: false,
+                data: "name=" + NewTask + "&Mark=" + 0,  
+                cache: false,
+                timeout: 30000,
+                error: function () {
+                    //alert('error');
+                    return true;
+                },
+                success: function (partialViewResult) {
+                    $("#results").html(partialViewResult);
+                }
+            });
+        });
+    $('#NewTask').keyup(function(e){
+        if(e.keyCode == 13)
+        {
+            $('#NewTask').blur();
+        }
+    });
+</script>

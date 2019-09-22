@@ -1,0 +1,36 @@
+﻿body {
+}
+
+
+.thBorder {
+  border-left: 2px solid #ddd;
+  border-top: 0px !important;
+}
+
+.thB {
+  border-top: 0px !important;
+}
+
+.tdBorder {
+  border-left: 2px solid #ddd;
+  /*border-bottom: 1px solid #ddd;*/
+}
+
+.TaskTable td, .TaskTable th {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+th, td, tfoot {font-style: italic;
+}
+
+
+
+#results {
+    margin-top: 100px;
+}
+
+.center-div {
+    margin: 0 auto;
+    width: 100px;
+}

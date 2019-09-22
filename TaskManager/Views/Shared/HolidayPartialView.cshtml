@@ -1,0 +1,177 @@
+﻿
+@model IEnumerable<TaskManager.Models.TaskList>
+
+    <table class="tblHoliday">
+        <tr>
+            <th class="thB"></th>
+            <th class="thBorder">
+                I want to ..
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.CheckBoxFor(modelItem => item.Mark, new { id = item.Id })
+                </td>
+                <td class="tdBorder">
+                    @{string style = (item.Mark) ? "text-decoration: line-through;" : null; }
+                    <div style="@style">@Html.DisplayFor(modelItem => item.Name, new { id = item.Id })</div>
+                </td>
+
+            </tr>
+        }
+
+        <tr>
+            <td></td>
+            <td class="tdBorder">
+                <input type="text" id="NewTask" name="NewTask">
+            </td>
+        </tr>
+
+        <tfoot>
+            <tr>
+                <td></td>
+                <td class="tdBorder">
+                    @Model.Count().ToString() @((@Model.Count() > 1) ? (" tasks") : (" task"))
+                </td>
+
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+    $('input:checkbox').click(function () {
+        var $this = $(this);
+        if ($this.is(":checked")) {
+            $.ajax({
+                url: "/Home/CheckTask",
+                type: 'POST',
+                data: "{'Id': " + $this.attr("id") + ", Mark: 1}",
+                success: function (data) {
+                    if (data) {
+                        $("#results").html(data);
+                    }
+                }
+            });
+        } else {
+            $.ajax({
+                url: "/Home/CheckTask",
+                type: 'POST',
+                data: "{'Id': " + $this.attr("id") + ", Mark: 0}",
+                success: function (data) {
+                    if (data) {
+                        $("#results").html(data);
+                    }
+                }
+            });
+        }
+    });
+
+
+    $("#pY__").on("click", function() {
+            var val = $('#yearSelect3').val();
+            $.ajax({
+                url: '/Home/Calendar',
+                type: 'POST',
+                data:  "year=1",
+                error: function () {
+                    alert('error-year');
+                    return true;
+                },
+                success: function (msg) {
+                    alert('success-year');
+                    if (parseFloat(msg)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            })
+                .done(function (partialViewResult) {
+                alert('.done');
+                $("#refTable").html(partialViewResult);
+            });
+    });
+
+    $(function () {
+        $('#NewTask').focusout(function () {
+            var NewTask = $(this).val();
+
+            $.ajax({
+                url: '/Home/SaveNewTask',
+                type: 'POST',
+                async: false,
+                data: "name=" + NewTask + "&Mark=" + 0,
+                cache: false,
+                timeout: 30000,
+                error: function () {
+                    alert('error');
+                    return true;
+                },
+                success: function (msg) {
+                    //alert('success+');
+                    window.location.reload(true);
+                    if (parseFloat(msg)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            });
+
+
+        });
+    });
+
+
+    $("#pY_").click(function () {
+        $.ajax({
+            url: '/Home/Calendar',
+            type: 'POST',
+            async: false,
+            data: "year=1",
+            cache: false,
+            timeout: 30000,
+            error: function () {
+                alert('error year=1');
+                return true;
+            },
+            success: function (msg) {
+                alert('success year=1');
+                if (parseFloat(msg)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        });
+    });
+
+    $("#pY").click(function () {
+        //alert('button clicked');
+        //$("#results").html(data);
+        $('#toptitle').html('New world');
+
+            $.ajax({
+                url: '/Home/Calendar',
+                type: 'POST',
+                async: false,
+                data: "year=1",
+                cache: false,
+                timeout: 30000,
+                error: function () {
+                    alert('error');
+                    return true;
+                },
+                success: function (msg) {
+                    alert('success_Calendar');
+                 }
+            }).done(function (partialViewResult) {
+                alert('done');
+                $("#refTable").html(partialViewResult);
+            });
+    }
+);
+    </script>
