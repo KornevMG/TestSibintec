@@ -17,11 +17,11 @@ namespace TaskManager.Controllers
         public ActionResult Index()
         { 
             DB _db = new DB();
-            foreach (TaskList t in _db.TaskLists)
-            {
-                if (t.Mark) t.Name = String.Format("Comlete  {0}", t.Name);
-            }
             return View(_db.TaskLists.OrderBy(x => x.Dt).ToList());
+        }
+        public ActionResult Values()
+        {
+            return View();
         }
         [HttpPost]
         public ActionResult TaskSearch()
@@ -53,6 +53,46 @@ namespace TaskManager.Controllers
                 }
             return PartialView("TaskSearch", db.TaskLists.OrderBy(x => x.Dt).ToList());
         }
+        public void SaveNewTaskByGUID(string name, string Mark, string NewGUID)
+        {
+            DB db = new DB();
+            try
+            {
+                TaskList tasks = new TaskList();
+                tasks.Id = Guid.Parse(NewGUID);
+                tasks.Name = name;
+                tasks.Mark = false;
+                tasks.Dt = DateTime.Now;
+
+                db.TaskLists.Add(tasks);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                String er = ex.Message;
+            }
+        }
+
+        public void CheckTaskByGUID(Guid? Id, string Mark)
+        {
+            if (Id != null)
+                try
+                {
+                    DB db = new DB();
+                    TaskList task = db.TaskLists.Find(Id);
+
+                    if (Mark == "0") task.Mark = false;
+                    else if (Mark == "1") task.Mark = true;
+
+                    db.Entry(task).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    String er = ex.Message;
+                }
+        }
+
         public ActionResult CheckTask(Guid? Id, string Mark)
         {
             

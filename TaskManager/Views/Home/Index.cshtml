@@ -2,12 +2,18 @@
 
 @{
     ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<div>
+    <div class="center-div">
+        <h2>MVC</h2>
+    </div>
+</div>
+
+
 <div id="results">
     @Html.Partial("TaskSearch")
 </div>
 
-
-
-<h3 style="margin-top:100px"> Обновляется только PartialView, страница загрузилась в момент @DateTime.Now</h3>
 

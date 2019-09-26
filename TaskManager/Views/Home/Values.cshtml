@@ -1,0 +1,202 @@
+﻿
+@{
+    ViewBag.Title = "Values";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+      <div>
+        <div class="center-div">
+                    <h2>WebAPI</h2>
+                </div>
+            </div>
+
+            <div id="app"></div>
+
+
+            @section scripts
+{
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        var StartData = new InitObj();
+                        StartData.GetData();
+                    });
+
+                    function InitObj() { }
+                    var StartData = new InitObj();
+
+                    InitObj.prototype.Initial = function () {
+                        $('input:checkbox').each(function () {
+                            var $this = $(this);
+                            var Taskdiv = $("div[id='" + $this.attr("id") + "']");
+                            var TaskName = $("input[id='" + $this.attr("id") + "'][name='TaskName']");
+                            if ($this.is(":checked")) {
+                                Taskdiv.css('text-decoration', 'line-through');
+                                Taskdiv.html('Comlete  ' + TaskName.val());
+                                var Mark = 1;
+                            } else {
+                                Taskdiv.css('text-decoration', '');
+                                Taskdiv.html(TaskName.val());
+                                var Mark = 0;
+                            }
+                            InitObj.prototype.SetRowsCount();
+                        });
+
+                        $('input:checkbox').click(function () {
+                            var $this = $(this);
+                            var Taskdiv = $("div[id='" + $this.attr("id") + "']");
+                            var TaskName = $("input[id='" + $this.attr("id") + "'][name='TaskName']");
+
+                            if ($this.is(":checked")) {
+                                Taskdiv.css('text-decoration', 'line-through');
+                                Taskdiv.html('Comlete  ' + TaskName.val());
+                                var Mark = 1;
+                            } else {
+                                Taskdiv.css('text-decoration', '');
+                                Taskdiv.html(TaskName.val());
+                                var Mark = 0;
+                            }
+
+                            $.ajax({
+                                url: '/Home/CheckTaskByGUID',
+                                type: 'POST',
+                                async: false,
+                                data: "Id=" + $this.attr("id") + "&Mark=" + Mark,
+                                cache: false,
+                                timeout: 30000
+                            });
+                        });
+
+                        $('#NewTask').keyup(function (e) {
+                            if (e.keyCode == 13) {
+                                var NewTask = $(this).val();
+                                var NewGUID = InitObj.prototype.generateGuid();
+                                $(".trNewTask").before("<tr><td class=\"tdBorderCh\"><input name=\"item.Mark\" id=\"" + NewGUID + "\" type=\"checkbox\" value=\"true\"><input name=\"item.Mark\" type=\"hidden\" value=\"false\"></td><td class=\"tdBorder\"><div id=\"" + NewGUID + "\">" + NewTask + "</div><input name=\"TaskName\" id=\"" + NewGUID + "\" type=\"hidden\" value=\"" + NewTask + "\"></td></tr>");
+                                $("input[id='" + NewGUID + "']").on('click', function () {
+                                    var $this = $(this);
+                                    var Taskdiv = $("div[id='" + $this.attr("id") + "']");
+                                    var TaskName = $("input[id='" + $this.attr("id") + "'][name='TaskName']");
+
+                                    if ($this.is(":checked")) {
+                                        $("div[id='" + $this.attr("id") + "']").css('text-decoration', 'line-through');
+                                        Taskdiv.html('Comlete  ' + TaskName.val());
+                                        var Mark = 1;
+                                    } else {
+                                        $("div[id='" + $this.attr("id") + "']").css('text-decoration', '');
+                                        Taskdiv.html(TaskName.val());
+                                        var Mark = 0;
+                                    }
+
+                                    $.ajax({
+                                        url: '/Home/CheckTaskByGUID',
+                                        type: 'POST',
+                                        async: false,
+                                        data: "Id=" + $this.attr("id") + "&Mark=" + Mark,
+                                        cache: false,
+                                        timeout: 30000
+                                    });
+                                });
+
+                                InitObj.prototype.SetRowsCount();
+
+                                $.ajax({
+                                    url: '/Home/SaveNewTaskByGUID',
+                                    type: 'POST',
+                                    async: false,
+                                    data: "name=" + NewTask + "&Mark=" + 0 + "&NewGUID=" + NewGUID,
+                                    cache: false,
+                                    timeout: 30000,
+                                    error: function () {
+                                        return true;
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    InitObj.prototype.SetRowsCount = function () {
+                        $('#NewTask').val("");
+                        var RowsCount = $('.TaskTable1 tr').length - 3;
+                        if (RowsCount == 1)
+                            $('#RowsCount').html(RowsCount + " task");
+                        else
+                            $('#RowsCount').html(RowsCount + " tasks");
+                    }
+
+                    InitObj.prototype.generateGuid = function () {
+                        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                            return v.toString(16);
+                        });
+                    }
+
+
+
+
+                    InitObj.prototype.GetData = function () {
+
+                        $("#createBlock").css('display', 'block');
+                        $("#editBlock").css('display', 'none');
+                        $.ajax({
+                            url: '/api/values',
+                            type: 'GET',
+                            async: false,
+                            dataType: 'json',
+                            success: function (data) {
+                                StartData.WriteResponse(data);
+                                StartData.Initial();
+                            },
+                            error: function (x) {
+                                alert(x);
+                            }
+                        });
+                    }
+
+
+                    InitObj.prototype.WriteResponse = function (TaskLists) {
+                        var strResult = "<div id=\"searchresults\"><div id=\"res\" class=\"center-div\"><table name=\"TaskTable1\" class=\"TaskTable1\">" +
+                            "<tr>" +
+                            "<th class=\"thB\"></th>" +
+                            "<th class=\"thBorder\">" +
+                            "I want to.." +
+                            "</th>" +
+                            "</tr>";
+
+                        $.each(TaskLists, function (index, TaskList) {
+
+                            var checked = (TaskList.mark == 1) ? "checked = \"checked\"" : "";
+
+                            strResult += "<tr >" +
+                                "<td class=\"tdBorderCh\">" +
+                                "<input id=\"" + TaskList.id + "\" name=\"item.Mark\" type=\"checkbox\" " + checked + " value=\"" + TaskList.mark + "\" /> <input name=\"item.Mark\" type=\"hidden\" value=\"false\" />" +
+                                "</td>" +
+                                "<td class=\"tdBorder\">" +
+                                "<div id=\"" + TaskList.id + "\">" + TaskList.name + "</div>" +
+                                "<input id=\"" + TaskList.id + "\" name=\"TaskName\" type=\"hidden\" value=\"" + TaskList.name + "\" />" +
+                                "</td>" +
+                                "</tr>";
+                        });
+
+
+                        strResult += "<tr class=\"trNewTask\">" +
+                            "<td class=\"tdBorderCh\"></td>" +
+                            "<td class=\"tdBorder\">" +
+                            "<input type=\"text\" id=\"NewTask\" placeholder=\"NewTask\" name=\"NewTask\" style=\"border: none\">" +
+                            "<td>" +
+                            "</tr>" +
+                            "<tfoot>" +
+                            "<tr>" +
+                            "<td class=\"tdBorderCh\"></td>" +
+                            "<td id=\"RowsCount\" class=\"tdBorder\">" +
+                            "tasks" +
+                            "</td>" +
+                            "</tr>" +
+                            "</tfoot>" +
+                            "</table></div></div>";
+
+                        $("#app").html(strResult);
+                    }
+
+                </script>
+            }
+
